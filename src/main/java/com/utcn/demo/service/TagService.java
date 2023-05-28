@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TagService {
@@ -61,25 +62,26 @@ public class TagService {
         return new ResponseEntity<>(questions, HttpStatus.OK);
     }
 
-    public ResponseEntity<Tag> addTag(Long questionId, Tag tagRequest) {
-        Tag tag = questionRepository.findById(questionId).map(question -> {
-            Long tagId = tagRequest.getId();
+    public Tag addTag(Long questionId, Tag tagRequest) {
+        Tag tagToBeAdded = this.createTag(tagRequest);
+        Optional<Question> foundQuestion = questionRepository.findQuestionById(questionId);
 
-            //tag exists
-            if (tagId != null) {
-                Tag _tag = tagRepository.findById(tagId)
-                        .orElse(null);
-                question.addTag(_tag);
-                questionRepository.save(question);
-                return _tag;
-            }
+        if (foundQuestion.isEmpty()) {
+            return null;
+        } else {
+            foundQuestion.get().addTag(tagToBeAdded);
+            questionRepository.save(foundQuestion.get());
+        }
+        return tagToBeAdded;
+    }
 
-            //add and create new tag
-            question.addTag(tagRequest);
-            return tagRepository.save(tagRequest);
-        }).orElse(null);
+    public Tag createTag(Tag tag) {
+        Tag foundTag = tagRepository.findByName(tag.getName());
+        if (foundTag != null) {
+            return foundTag;
+        }
 
-        return new ResponseEntity<>(tag, HttpStatus.CREATED);
+        return tagRepository.save(tag);
     }
 
     public ResponseEntity<Tag> updateTag(Tag tagRequest) {

@@ -1,17 +1,22 @@
 package com.utcn.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "question")
 public class Question {
 
@@ -48,6 +53,33 @@ public class Question {
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
+
+    @Lob
+    @Column(name = "picture", length = Integer.MAX_VALUE, columnDefinition = "LONGTEXT")
+    private String picture;
+    @OneToMany(mappedBy = "question",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    private Set<Vote> votes;
+
+    @OneToMany(mappedBy = "question")
+    private List<Answer> answers = new ArrayList<>();
+
+    public Set<Vote> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Set<Vote> votes) {
+        this.votes = votes;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

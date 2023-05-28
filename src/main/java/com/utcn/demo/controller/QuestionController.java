@@ -1,5 +1,7 @@
 package com.utcn.demo.controller;
 
+import com.utcn.demo.dtos.QuestionDto;
+import com.utcn.demo.dtos.SaveQuestionDto;
 import com.utcn.demo.entity.Question;
 import com.utcn.demo.service.QuestionService;
 import jakarta.transaction.Transactional;
@@ -23,6 +25,13 @@ public class QuestionController {
         return questionService.getAllQuestions();
     }
 
+    @GetMapping("/getAllSorted")
+    @ResponseBody
+    public List<QuestionDto> getAllQuestionsSorted() {
+        return questionService.getAllQuestionsInOrder();
+    }
+
+
     @GetMapping("/getById/{id}")
     @ResponseBody
     public ResponseEntity<Question> getQuestionById(@PathVariable Long id) {
@@ -39,6 +48,13 @@ public class QuestionController {
     @ResponseBody
     public ResponseEntity<Question> createQuestion(@PathVariable(value = "userId") Long userId, @RequestBody Question question) {
         return questionService.createQuestion(userId,question);
+    }
+
+    @PostMapping("/saveQuestion")
+    @ResponseBody
+    public QuestionDto saveQuestion(@RequestBody SaveQuestionDto saveQuestionDto) {
+        return questionService.saveQuestion(saveQuestionDto.getUserId(), saveQuestionDto.getTitle(),
+                saveQuestionDto.getDescription(), saveQuestionDto.getPicture());
     }
 
     @PutMapping("/updateQuestion")

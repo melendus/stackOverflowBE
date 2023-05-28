@@ -1,5 +1,7 @@
 package com.utcn.demo.controller;
 
+import com.utcn.demo.dtos.AddAnswerRequestDto;
+import com.utcn.demo.dtos.AnswerDto;
 import com.utcn.demo.entity.Answer;
 import com.utcn.demo.service.AnswerService;
 import jakarta.transaction.Transactional;
@@ -22,6 +24,11 @@ public class AnswerController {
     @ResponseBody
     public ResponseEntity<List<Answer>> getAllAnswers() {
         return answerService.getAllAnswers();
+    }
+    @GetMapping("/getAllByQuestionId/{questionId}")
+    @ResponseBody
+    public List<Answer> retrieveAnswersByQuestionId(@PathVariable Long questionId) {
+        return answerService.retrieveAnswersByQuestionId(questionId);
     }
 
     @GetMapping("/getById/{id}")

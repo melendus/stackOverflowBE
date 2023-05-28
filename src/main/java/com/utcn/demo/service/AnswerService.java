@@ -1,17 +1,22 @@
 package com.utcn.demo.service;
 
+import com.utcn.demo.dtos.AnswerDto;
 import com.utcn.demo.entity.Answer;
 import com.utcn.demo.entity.Question;
+import com.utcn.demo.entity.User;
 import com.utcn.demo.repository.AnswerRepository;
 import com.utcn.demo.repository.QuestionRepository;
 import com.utcn.demo.repository.UserRepository;
+import com.utcn.demo.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AnswerService {
@@ -23,6 +28,9 @@ public class AnswerService {
 
     @Autowired
     QuestionRepository questionRepository;
+
+    @Autowired
+    VoteRepository voteRepository;
 
     public List<Answer> retrieveAnswers() {
         return answerRepository.findAll();
@@ -38,6 +46,7 @@ public class AnswerService {
 
         return new ResponseEntity<>(answers, HttpStatus.OK);
     }
+
 
     public ResponseEntity<List<Answer>> getAnswersByTitle(String title) {
         List<Answer> answers = new ArrayList<>();
@@ -77,6 +86,7 @@ public class AnswerService {
                 .orElseThrow();
         _answer.setTitle(answer.getTitle());
         _answer.setDescription(answer.getDescription());
+        _answer.setPicture(answer.getPicture());
 
         return new ResponseEntity<>(answerRepository.save(_answer), HttpStatus.OK);
     }
@@ -93,5 +103,39 @@ public class AnswerService {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+//    private Answer mapAnswer(Answer answer) {
+//        Long voteCount = votesRepository.getVotesValue(answer.getContent().getContentId());
+//
+//        if (voteCount == null) {
+//            voteCount = 0L;
+//        }
+//
+//        User user = answer.getContent().getUser();
+//        UserDTO userDTO = new UserDTO(user.getUserId(), user.getFirstName(), user.getLastName(), user.getScore(), user.getRole(), user.isBanned());
+//
+//        return new AnswerDTO(answer.getAnswerId(), answer.getQuestion(), answer.getContent(), userDTO, voteCount);
+//    }
 
+    public List<Answer> retrieveAnswersByQuestionId(Long questionId) {
+        List<Answer> answers = answerRepository.findByQuestionId(questionId);
+
+        //            Answer mappedAnswer = mapAnswer(answer);
+        List<Answer> answersFinal = new ArrayList<>(answers);
+
+        Collections.sort(answersFinal);
+
+        return answersFinal;
+    }
+
+//    public AnswerDto saveAnswer(Long questionId, Long userId, String description, String picture) {
+//        Optional<User> user = userRepository.findById(userId);
+//        Optional<Question> question = questionRepository.findQuestionById(questionId);
+//
+//        if (user.isEmpty() || question.isEmpty()) {
+//            return null;
+//        }
+//
+//        Answer answerToAdd = new Answer();
+//
+//    }
 }

@@ -1,10 +1,17 @@
 package com.utcn.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "users")
 public class User {
 
@@ -28,6 +35,19 @@ public class User {
     @Column(name = "u_password")
     private String password;
 
+    @Column(name = "banned")
+    private boolean banned = false;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "score")
+    private Double score = 0.0D;
+
+    @OneToMany(mappedBy = "user",
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    private Set<Vote> votes;
 
     public String getRole() {
         return role;
@@ -87,4 +107,5 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

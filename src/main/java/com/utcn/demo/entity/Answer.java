@@ -1,19 +1,25 @@
 package com.utcn.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "answer")
-public class Answer {
+public class Answer implements Comparable<Answer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@Column(name = "answer_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "answer_id")
     private Long answerId;
 
     @Column(name = "answer_title")
@@ -22,9 +28,13 @@ public class Answer {
     @Column(name = "answer_description")
     private String description;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @MapsId
+    @Lob
+    @Column(name = "picture", length = Integer.MAX_VALUE, columnDefinition = "LONGTEXT")
+    private String picture;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
+    @JsonIgnore
     private Question question;
 
     @Column(updatable = false)
@@ -38,6 +48,11 @@ public class Answer {
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
+
+    @OneToMany(mappedBy = "answer",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    private Set<Vote> votes;
 
     public Answer() {
 
@@ -102,5 +117,13 @@ public class Answer {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public int compareTo(Answer answer) {
+        int answerVoteCount = this.votes.size();
+        int comparedAnswerVoteCount = answer.votes.size();
+
+        return Integer.compare(comparedAnswerVoteCount, answerVoteCount);
     }
 }

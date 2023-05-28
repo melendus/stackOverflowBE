@@ -44,7 +44,9 @@ public class TagController {
 
     @PostMapping("/addTag/{questionId}")
     @ResponseBody
-    public ResponseEntity<Tag> addTag(@PathVariable(value = "questionId") Long questionId, @RequestBody Tag tagRequest) {
+    public Tag addTag(@PathVariable(value = "questionId") Long questionId, @RequestBody Tag tagRequest) {
+        System.out.println(tagRequest.getName());
+        System.out.println("-----------------");
         return tagService.addTag(questionId, tagRequest);
     }
 

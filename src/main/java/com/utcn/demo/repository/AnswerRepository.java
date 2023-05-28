@@ -13,4 +13,5 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     void deleteByQuestionId(Long id);
 
     List<Answer> findByTitleContaining(String title);
+    List<Answer> findByQuestionId(Long id);
 }
